@@ -26,7 +26,7 @@ const LandingPage = () => {
                 {/* Background Image Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="/home/img/landing/uploaded_image_0_1768144162832.jpg"
+                        src="/img/landing/uploaded_image_0_1768144162832.jpg"
                         alt="Avión en nubes"
                         className="w-full h-full object-cover opacity-40 hover:scale-105 transition-transform duration-[20s]"
                     />
@@ -106,7 +106,7 @@ const LandingPage = () => {
                 <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
                     <div className="md:w-1/2">
                         {/* THE "G" IMAGE (Globe/Books) */}
-                        <img src="/home/img/landing/uploaded_image_2_1768152607150.jpg" alt="El idioma es el camino" className="rounded-2xl shadow-2xl" />
+                        <img src="/img/landing/uploaded_image_2_1768152607150.jpg" alt="El idioma es el camino" className="rounded-2xl shadow-2xl" />
                     </div>
                     <div className="md:w-1/2">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -148,7 +148,7 @@ const LandingPage = () => {
                 <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
                     <div className="md:w-1/2">
                         {/* CV IMAGE */}
-                        <img src="/home/img/landing/uploaded_image_1_1768152607150.jpg" alt="Revolución CV" className="rounded-2xl shadow-2xl" />
+                        <img src="/img/landing/uploaded_image_1_1768152607150.jpg" alt="Revolución CV" className="rounded-2xl shadow-2xl" />
                     </div>
                     <div className="md:w-1/2">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -170,7 +170,7 @@ const LandingPage = () => {
             <section className="py-20 bg-slate-800 relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 flex flex-col md:flex-row-reverse items-center gap-12">
                     <div className="md:w-1/2">
-                        <img src="/home/img/landing/uploaded_image_2_1768150943006.jpg" alt="Coaching Personalizado" className="rounded-2xl shadow-2xl" />
+                        <img src="/img/landing/uploaded_image_2_1768150943006.jpg" alt="Coaching Personalizado" className="rounded-2xl shadow-2xl" />
                     </div>
                     <div className="md:w-1/2">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -217,7 +217,7 @@ const LandingPage = () => {
 
             {/* 7. CTA / FINAL PITCH */}
             <section className="relative py-24 bg-blue-900 overflow-hidden">
-                <img src="/home/img/landing/uploaded_image_3_1768144162832.jpg" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" alt="Paris" />
+                <img src="/img/landing/uploaded_image_3_1768144162832.jpg" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" alt="Paris" />
                 <div className="relative container mx-auto px-6 text-center z-10">
                     <h2 className="text-4xl md:text-5xl font-bold mb-6">La preparación correcta transforma el camino</h2>
                     <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed">

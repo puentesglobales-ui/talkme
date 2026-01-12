@@ -42,24 +42,15 @@ class InterviewCoach {
         ];
 
         try {
-            const response = await this.router.routeRequest({
-                // We pass the messages array structure differently depending on the router, 
-                // but here we let the router handle the prompt construction if needed, 
-                // or we pass a raw prompt if sticking to the basic API.
-                // Assuming routeRequest handles a 'messages' array if we overload the prompt arg or add a new one.
-                // For safety in this MVP, let's use the 'prompt' string approach or modify router.
-                // Let's assume AIRouter adapts or we use OpenAI directly for chat history.
-                // Actually, existing aiRouter takes 'prompt'. Let's wrap history into a text block for DeepSeek/Mock or use OpenAI for chat.
+            // Determine provider based on user (or default to Premium for now)
+            // Ideally we'd pass userId to getInterviewResponse, but for now we rely on defaults or simple logic if needed.
+            // Using a dummy ID or null ensures Default/Premium route unless configured otherwise.
+            const providerConfig = this.router.getRoute(null);
 
-                // For high quality roleplay, we probably want GPT-4o via the existing openai client in server.js, 
-                // BUT let's try to use the router to save cost if possible.
-                // Actually, for "Chat", a string prompt is messy.
-                // Let's rely on the router's providerOverride logic but format as a script.
-
-                prompt: JSON.stringify(messages), // Temporary hack if router expects string
-                complexity: 'complex', // Use smart model
-                system_instruction: systemPrompt
-            });
+            const response = await this.router.chat(
+                messages,
+                providerConfig
+            );
 
             // If the router returns a string, use it.
             return response.text;

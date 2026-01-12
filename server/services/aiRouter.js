@@ -1,4 +1,9 @@
 const { translateWithDeepSeek } = require('./adapters/deepseek');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.trim() : '',
+});
 // Lazy load these to avoid crashing if deps/keys are missing immediately
 const getDeepgram = () => require('./adapters/deepgram');
 const getGoogle = () => require('./adapters/google');
@@ -93,6 +98,46 @@ class AIRouter {
             }
         }
         return null; // Default (ElevenLabs)
+    }
+
+    async chat(messages, providerConfig, systemInstruction) {
+        // DeepSeek / Challenger Path
+        if (providerConfig.llm === 'deepseek-chat') {
+            try {
+                // For MVP, we might not have a full DeepSeek chat adapter yet.
+                // We'll fallback to OpenAI for stability unless explicitly implemented.
+                // return await chatWithDeepSeek(messages);
+                console.log("⚠️ DeepSeek Chat not fully implemented, falling back to OpenAI.");
+            } catch (e) {
+                console.error("DeepSeek Chat Error:", e);
+            }
+        }
+
+        // Premium / Default Path (OpenAI)
+        try {
+            // Ensure system instruction is in messages if provided separately
+            const finalMessages = [...messages];
+            if (systemInstruction) {
+                // Check if system message already exists? Usually caller handles it.
+                // If caller passed separate systemInstruction, prepend it.
+                if (!finalMessages.some(m => m.role === 'system')) {
+                    finalMessages.unshift({ role: 'system', content: systemInstruction });
+                }
+            }
+
+            const completion = await openai.chat.completions.create({
+                model: providerConfig.llm === 'gpt-4o' ? 'gpt-4o' : 'gpt-3.5-turbo', // Fallback or strict
+                messages: finalMessages,
+            });
+
+            return {
+                text: completion.choices[0].message.content,
+                raw: completion
+            };
+        } catch (error) {
+            console.error("AIRouter Chat Error:", error);
+            throw error;
+        }
     }
 }
 
