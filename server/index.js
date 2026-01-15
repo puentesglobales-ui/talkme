@@ -257,7 +257,7 @@ const checkUsage = async (userId) => {
 };
 
 app.post('/api/profile', async (req, res) => {
-  const { userId, goal, level, interests, age } = req.body;
+  const { userId, goal, level, interests, age, role_title, role_industry, work_context } = req.body;
   if (!supabaseAdmin) return res.status(500).json({ error: 'DB not connected' });
 
   try {
@@ -269,6 +269,9 @@ app.post('/api/profile', async (req, res) => {
         level,
         interests,
         age,
+        role_title,       // New Career Field
+        role_industry,    // New Career Field
+        work_context,     // New Career Field
         onboarding_completed: true
       });
 

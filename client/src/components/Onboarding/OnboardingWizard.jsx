@@ -126,21 +126,23 @@ export default function OnboardingWizard({ session, onComplete }) {
             try {
                 console.log("Submitting Career Profile:", formData);
 
-                // Construct FormData for file upload support if needed
-                const payload = new FormData();
-                payload.append('userId', formData.userId);
-                payload.append('role_title', formData.role.title);
-                payload.append('role_industry', formData.role.industry);
-                payload.append('work_context', formData.workContext);
+                // Construct JSON Payload for Profile
+                const profilePayload = {
+                    userId: formData.userId,
+                    role_title: formData.role.title,
+                    role_industry: formData.role.industry,
+                    work_context: formData.workContext
+                };
+
+                // 1. Save Profile Data
+                await api.post('/profile', profilePayload);
+
+                // 2. (Optional) If CV file exists, we could analyze it here, but let's keep it simple for now
+                // and just rely on the user doing the ATS Scanner later.
                 if (formData.cv?.file) {
-                    payload.append('cv_file', formData.cv.file);
+                    console.log("CV File pending upload:", formData.cv.file.name);
+                    // TODO: Calls to /analyze-cv or upload endpoint if needed
                 }
-
-                // Call API (Ensure backend handles this, or just mock success for UI demo)
-                // await api.post('/profile/career-setup', payload); 
-
-                // MOCK SUCCESS for now to show flow
-                await new Promise(r => setTimeout(r, 1500));
 
                 if (onComplete) onComplete();
                 else navigate('/dashboard');

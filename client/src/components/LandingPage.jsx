@@ -180,9 +180,13 @@ const LandingPage = () => {
                         </div>
 
                         {/* Abstract Representation instead of Photo */}
-                        <div className="relative h-[500px] w-full bg-gradient-to-tr from-slate-900 to-slate-800 rounded-[3rem] border border-cyan-500/20 overflow-hidden flex items-center justify-center group">
+                        <div className="relative h-[500px] w-full bg-gradient-to-tr from-slate-900 to-slate-800 rounded-[3rem] border border-cyan-500/20 overflow-hidden flex items-center justify-center group p-10">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(34,211,238,0.1),transparent_70%)]"></div>
-                            <Globe size={240} className="text-cyan-500/80 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)] animate-pulse" strokeWidth={0.8} />
+                            <img
+                                src="/logo-hero.png"
+                                alt="Global Mindset Logo"
+                                className="max-w-full max-h-full object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.4)] opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                            />
                         </div>
                     </div>
                 </div>
