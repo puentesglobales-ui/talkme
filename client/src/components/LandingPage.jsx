@@ -183,9 +183,9 @@ const LandingPage = () => {
                         <div className="relative h-[500px] w-full bg-slate-900 rounded-[3rem] border border-cyan-500/20 overflow-hidden flex items-center justify-center group p-10 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_60%)]"></div>
                             <img
-                                src="/logo-puentes.png"
+                                src="/logo-new.png"
                                 alt="Puentes Globales Logo"
-                                className="max-w-[80%] max-h-[80%] object-contain rounded-full shadow-[0_0_50px_rgba(34,211,238,0.2)] transition-transform duration-700 group-hover:scale-105"
+                                className="w-full h-full object-contain rounded-full shadow-[0_0_50px_rgba(34,211,238,0.2)] transition-transform duration-700 group-hover:scale-105 bg-white/5 p-2"
                             />
                         </div>
                     </div>
