@@ -45,6 +45,15 @@ const InterviewSimulator = ({ session }) => {
     }, [messages]);
 
     const handleStart = async () => {
+        if (!session) {
+            alert("Debes iniciar sesión para entrenar.");
+            return;
+        }
+
+        // MVP Authorization Mock
+        const userType = session?.user?.user_metadata?.is_premium ? 'Premium' : 'Free';
+        // Allow Free users for MVP demo, but logically we would check usage limit here
+
         if (!cvText || !jobDesc) {
             alert("Necesitamos tu CV y la Vacante para entrenar a Alex.");
             return;
