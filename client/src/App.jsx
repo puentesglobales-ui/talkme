@@ -98,7 +98,7 @@ function App() {
       return "/payment-setup";
     }
 
-    return onboardingComplete ? "/dashboard" : "/languages";
+    return onboardingComplete ? "/dashboard" : "/onboarding";
   };
 
   // Helper for protected routes that should also respect payment gate

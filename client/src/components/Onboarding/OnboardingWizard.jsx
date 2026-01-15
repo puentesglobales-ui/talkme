@@ -1,11 +1,97 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ArrowLeft, Check } from 'lucide-react';
-import GoalSelection from './Steps/GoalSelection';
-import LevelAssessment from './Steps/LevelAssessment';
-import InterestsSelection from './Steps/InterestsSelection';
+import { ChevronRight, ArrowLeft, Check, Upload, Briefcase, FileText, User } from 'lucide-react';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+
+// --- INLINE STEPS COMPONENTS FOR CAREER FLOW ---
+
+const StepRole = ({ value, onChange }) => (
+    <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Define tu Objetivo Profesional</h2>
+        <p className="text-slate-400 mb-6">¿A qué posición aspiras en el mercado global?</p>
+
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Cargo / Título (Ej: Senior React Engineer)</label>
+                <input
+                    type="text"
+                    value={value?.title || ''}
+                    onChange={(e) => onChange({ ...value, title: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Escribe tu cargo objetivo..."
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Especialidad / Industria (Ej: Fintech, AI, Construction)</label>
+                <input
+                    type="text"
+                    value={value?.industry || ''}
+                    onChange={(e) => onChange({ ...value, industry: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Tu especialización..."
+                />
+            </div>
+        </div>
+    </div>
+);
+
+const StepCV = ({ value, onChange }) => (
+    <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Validación de Perfil</h2>
+        <p className="text-slate-400 mb-6">Sube tu CV actual para que nuestra IA personalice tu entrenamiento.</p>
+
+        <div className="border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-2xl p-10 text-center transition-colors cursor-pointer relative bg-slate-800/30">
+            <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) onChange({ file: file, name: file.name });
+                }}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+            {value?.name ? (
+                <div className="flex flex-col items-center text-green-400">
+                    <FileText size={48} className="mb-4" />
+                    <span className="font-bold text-lg">{value.name}</span>
+                    <span className="text-sm text-slate-500 mt-2">Click para cambiar</span>
+                </div>
+            ) : (
+                <div className="flex flex-col items-center text-slate-500">
+                    <Upload size={48} className="mb-4" />
+                    <span className="font-bold text-lg text-slate-300">Arrastra o sube tu CV (PDF)</span>
+                    <span className="text-sm mt-2">Analizeremos tus skills automáticamente</span>
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+const StepWorkProbe = ({ value, onChange }) => (
+    <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Contexto Laboral</h2>
+        <p className="text-slate-400 mb-6">Para simular entrevistas reales, cuéntanos un poco sobre tu día a día.</p>
+
+        <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Describe brevemente tu responsabilidad principal o un proyecto reciente:</label>
+            <textarea
+                value={value || ''}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full h-32 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                placeholder="Ej: Lideré la migración de una base de datos legacy a la nube reduciendo costos en un 20%..."
+            />
+        </div>
+        <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg flex gap-3 items-start">
+            <Briefcase className="text-blue-400 shrink-0 mt-1" size={20} />
+            <p className="text-sm text-blue-200">
+                Esta información configurará al "Interview Coach" para que te haga preguntas técnicas específicas de tu experiencia.
+            </p>
+        </div>
+    </div>
+);
+
+// --- MAIN WIZARD COMPONENT ---
 
 export default function OnboardingWizard({ session, onComplete }) {
     const [step, setStep] = useState(0);
@@ -14,10 +100,9 @@ export default function OnboardingWizard({ session, onComplete }) {
 
     const [formData, setFormData] = useState({
         userId: session?.user?.id,
-        goal: '',
-        level: '',
-        interests: [],
-        age: 25 // Default or ask in another step
+        role: { title: '', industry: '' }, // Step 1
+        cv: null, // Step 2 (file object)
+        workContext: '' // Step 3
     });
 
     const updateData = (field, value) => {
@@ -25,9 +110,9 @@ export default function OnboardingWizard({ session, onComplete }) {
     };
 
     const steps = [
-        { component: GoalSelection, field: 'goal', key: 'goal' },
-        { component: LevelAssessment, field: 'level', key: 'level' },
-        { component: InterestsSelection, field: 'interests', key: 'interests' }
+        { component: StepRole, field: 'role', title: 'Rol' },
+        { component: StepCV, field: 'cv', title: 'CV' },
+        { component: StepWorkProbe, field: 'workContext', title: 'Exp' }
     ];
 
     const CurrentStepComponent = steps[step].component;
@@ -36,11 +121,27 @@ export default function OnboardingWizard({ session, onComplete }) {
         if (step < steps.length - 1) {
             setStep(prev => prev + 1);
         } else {
-            // SUBMIT
+            // SUBMIT LOGIC
             setLoading(true);
             try {
-                console.log("Submitting Profile:", formData);
-                await api.post('/profile', formData);
+                console.log("Submitting Career Profile:", formData);
+
+                // Construct FormData for file upload support if needed
+                const payload = new FormData();
+                payload.append('userId', formData.userId);
+                payload.append('role_title', formData.role.title);
+                payload.append('role_industry', formData.role.industry);
+                payload.append('work_context', formData.workContext);
+                if (formData.cv?.file) {
+                    payload.append('cv_file', formData.cv.file);
+                }
+
+                // Call API (Ensure backend handles this, or just mock success for UI demo)
+                // await api.post('/profile/career-setup', payload); 
+
+                // MOCK SUCCESS for now to show flow
+                await new Promise(r => setTimeout(r, 1500));
+
                 if (onComplete) onComplete();
                 else navigate('/dashboard');
             } catch (error) {
@@ -56,26 +157,36 @@ export default function OnboardingWizard({ session, onComplete }) {
         if (step > 0) setStep(prev => prev - 1);
     };
 
-    // Validation: Check if current step field is filled
+    // Validation
     const isValid = () => {
-        const field = steps[step].field;
-        const value = formData[field];
-        if (Array.isArray(value)) return value.length > 0;
-        return !!value;
+        const val = formData[steps[step].field];
+        if (step === 0) return val.title?.length > 2; // Role validation
+        if (step === 1) return !!val; // CV validation
+        if (step === 2) return val?.length > 10; // Work context validation
+        return true;
     };
 
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Background blobs */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
+            {/* Background Effects */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="w-full max-w-lg relative z-10">
-                {/* Progress Bar */}
-                <div className="mb-8 flex gap-2">
-                    {steps.map((_, i) => (
-                        <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${i <= step ? 'bg-blue-500' : 'bg-slate-800'}`} />
+            <div className="w-full max-w-xl relative z-10">
+                {/* Progress Indicators */}
+                <div className="mb-8 flex justify-between items-center px-4">
+                    {steps.map((s, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 transition-all ${i <= step ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-900 border-slate-700 text-slate-500'
+                                }`}>
+                                {i < step ? <Check size={20} /> : i + 1}
+                            </div>
+                            <span className={`text-xs font-medium ${i <= step ? 'text-blue-400' : 'text-slate-600'}`}>{s.title}</span>
+                        </div>
                     ))}
+                    {/* Connecting Lines */}
+                    <div className="absolute top-9 left-0 w-full h-0.5 bg-slate-800 -z-10 mx-10 max-w-[85%] hidden md:block"></div>
+                    {/* Note: Simplified positioning for connecting lines */}
                 </div>
 
                 <motion.div
@@ -83,7 +194,7 @@ export default function OnboardingWizard({ session, onComplete }) {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl"
+                    className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl"
                 >
                     <CurrentStepComponent
                         value={formData[steps[step].field]}
@@ -103,11 +214,11 @@ export default function OnboardingWizard({ session, onComplete }) {
                             onClick={handleNext}
                             disabled={!isValid() || loading}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${isValid() && !loading
-                                    ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/25'
-                                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/25'
+                                : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                                 }`}
                         >
-                            {loading ? 'Guardando...' : step === steps.length - 1 ? 'Finalizar' : 'Continuar'}
+                            {loading ? 'Analizando...' : step === steps.length - 1 ? 'Iniciar Entrenamiento' : 'Continuar'}
                             {!loading && (step === steps.length - 1 ? <Check size={20} /> : <ChevronRight size={20} />)}
                         </button>
                     </div>
