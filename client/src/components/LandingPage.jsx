@@ -122,7 +122,7 @@ const LandingPage = () => {
                             </Link>
 
                             {/* Card 3: Talkme */}
-                            <Link to="/dashboard" className="group p-8 bg-slate-900 border border-slate-800 rounded-3xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-pointer hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]">
+                            <a href="https://mvp-idiomas-server.onrender.com" target="_blank" rel="noopener noreferrer" className="group p-8 bg-slate-900 border border-slate-800 rounded-3xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-pointer hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]">
                                 <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                     <Bot className="text-indigo-400 w-8 h-8" />
                                 </div>
@@ -131,9 +131,8 @@ const LandingPage = () => {
                                 <div className="mt-6 flex items-center text-indigo-400 text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                                     Chatear ahora <ArrowRight size={20} className="ml-2" />
                                 </div>
-                            </Link>
+                            </a>
                         </div>
-
                     </motion.div>
                 </div>
             </section>
@@ -187,7 +186,7 @@ const LandingPage = () => {
                     <h2 className="text-5xl md:text-7xl font-bold mb-10 text-white">¿Listo para dar el salto?</h2>
                     <div className="flex flex-col md:flex-row justify-center gap-6">
                         <Link to="/login" className="px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-xl hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all transform hover:-translate-y-1">
-                            Crear Cuenta Gratuita
+                            Crear Cuenta
                         </Link>
                         <a href="https://calendly.com/puentesglobales" target="_blank" rel="noopener noreferrer" className="px-10 py-5 bg-transparent border border-white/10 text-white rounded-full font-bold text-xl hover:bg-white/5 transition-all outline-none focus:ring-2 focus:ring-cyan-500">
                             Agendar Mentoría
