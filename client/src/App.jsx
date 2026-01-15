@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import api from './services/api';
 import Login from './components/Login';
-import ChatInterface from './components/ChatInterface';
+
 import LandingPage from './components/LandingPage';
 
 import LanguageSelector from './components/LanguageSelector';
@@ -98,7 +98,7 @@ function App() {
       return "/payment-setup";
     }
 
-    return onboardingComplete ? "/dashboard" : "/onboarding";
+    return onboardingComplete ? "/ats-scanner" : "/onboarding";
   };
 
   // Helper for protected routes that should also respect payment gate
@@ -137,18 +137,11 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/dashboard" element={
+          <Route path="/ats-scanner" element={
             <ProtectedRoute>
-              {onboardingComplete ? <ChatInterface session={session} /> : <Navigate to="/onboarding" />}
+              {onboardingComplete ? <ATSScanner session={session} /> : <Navigate to="/onboarding" />}
             </ProtectedRoute>
           } />
-
-          <Route path="/payment-setup" element={
-            session ? <PaymentSetup session={session} /> : <Navigate to="/login" />
-          } />
-
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/ats-scanner" element={<ProtectedRoute><ATSScanner session={session} /></ProtectedRoute>} />
           <Route path="/cv-editor" element={<ProtectedRoute><CVEditor /></ProtectedRoute>} />
           <Route path="/interview" element={<ProtectedRoute><InterviewSimulator session={session} /></ProtectedRoute>} />
           <Route path="/" element={<LandingPage />} />
