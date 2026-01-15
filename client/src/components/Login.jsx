@@ -135,7 +135,7 @@ export default function Login() {
                                     onClick={() => setAccountType('freemium')}
                                     className={`flex-1 py-3 px-2 rounded-xl text-sm font-semibold border transition-all ${accountType === 'freemium' ? 'bg-indigo-600/10 border-indigo-500/50 text-indigo-400' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'}`}
                                 >
-                                    Prueba Gratis
+                                    Cuenta Freemium
                                 </button>
                             </div>
                         </div>
@@ -154,20 +154,7 @@ export default function Login() {
                             />
                         </div>
 
-                        {isSignUp && accountType === 'student' && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                                <label className="block text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">Código de Alumno</label>
-                                <input
-                                    type="text"
-                                    value={accessCode}
-                                    onChange={(e) => setAccessCode(e.target.value)}
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
-                                    placeholder="Código de 6 dígitos"
-                                    minLength={6}
-                                    required
-                                />
-                            </motion.div>
-                        )}
+                        {/* Access Code removed for Open MVP */}
 
                         <div>
                             <label className="block text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">Contraseña</label>

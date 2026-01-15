@@ -43,7 +43,7 @@ const LandingPage = () => {
                     {/* CTA Button */}
                     <div className="hidden md:flex items-center gap-4">
                         <Link to="/login" className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/40 transition-all flex items-center gap-2">
-                            Crear Cuenta Gratis <ArrowRight size={20} />
+                            Crear Cuenta <ArrowRight size={20} />
                         </Link>
                     </div>
 
