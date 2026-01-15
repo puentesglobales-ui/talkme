@@ -93,10 +93,17 @@ const StepWorkProbe = ({ value, onChange }) => (
 
 // --- MAIN WIZARD COMPONENT ---
 
+import { supabase } from '../../supabaseClient';
+
 export default function OnboardingWizard({ session, onComplete }) {
     const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = '/'; // Hard reload to clear state
+    };
 
     const [formData, setFormData] = useState({
         userId: session?.user?.id,
@@ -173,6 +180,13 @@ export default function OnboardingWizard({ session, onComplete }) {
             {/* Background Effects */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+            {/* Top Bar for Logout */}
+            <div className="absolute top-6 right-6 z-20">
+                <button onClick={handleLogout} className="text-slate-500 hover:text-white text-sm font-medium">
+                    Cerrar Sesión
+                </button>
+            </div>
 
             <div className="w-full max-w-xl relative z-10">
                 {/* Progress Indicators */}

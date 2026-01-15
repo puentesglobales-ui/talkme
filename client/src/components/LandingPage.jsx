@@ -38,12 +38,7 @@ const LandingPage = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Sales Menu */}
-                    <div className="hidden md:flex items-center gap-10 text-base font-medium text-slate-300">
-                        <a href="#features" className="hover:text-cyan-400 transition-colors">Soluciones</a>
-                        <a href="#how-it-works" className="hover:text-cyan-400 transition-colors">Cómo Funciona</a>
-                        <a href="#pricing" className="hover:text-cyan-400 transition-colors">Planes</a>
-                    </div>
+
 
                     {/* CTA Button */}
                     <div className="hidden md:flex items-center gap-4">
@@ -66,8 +61,7 @@ const LandingPage = () => {
                         className="md:hidden bg-slate-900 border-b border-white/10"
                     >
                         <div className="px-6 py-6 flex flex-col gap-6 text-lg">
-                            <a href="#features" className="text-slate-300 hover:text-cyan-400 py-2 border-b border-white/5" onClick={() => setIsMenuOpen(false)}>Soluciones</a>
-                            <a href="#how-it-works" className="text-slate-300 hover:text-cyan-400 py-2 border-b border-white/5" onClick={() => setIsMenuOpen(false)}>Cómo Funciona</a>
+                            <a href="https://mvp-idiomas-server.onrender.com" target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-cyan-400 py-2 border-b border-white/5" onClick={() => setIsMenuOpen(false)}>Talkme AI (Idiomas)</a>
                             <Link to="/login" className="text-cyan-400 font-bold py-2">Ingresar / Registrarse</Link>
                         </div>
                     </motion.div>
