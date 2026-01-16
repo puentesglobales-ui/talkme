@@ -155,7 +155,8 @@ export default function OnboardingWizard({ session, onComplete }) {
                 else navigate('/dashboard');
             } catch (error) {
                 console.error("Error saving profile:", error);
-                alert("Error guardando perfil. Intenta de nuevo.");
+                const serverMsg = error.response?.data?.details || error.message || "Error desconocido";
+                alert(`Error guardando perfil: ${serverMsg}`);
             } finally {
                 setLoading(false);
             }
