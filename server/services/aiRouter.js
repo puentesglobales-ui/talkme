@@ -62,6 +62,27 @@ class AIRouter {
 
     // --- METHODS ---
 
+    async routeRequest(params, options = {}) {
+        const { prompt, complexity, providerOverride, system_instruction } = params;
+
+        // 1. Determine Provider
+        // If complexity is 'hard', prefer Premium.
+        // If override is implicit 'auto', we could use AB testing or complexity.
+        let providerConfig = PROVIDERS.PREMIUM; // Default
+
+        if (complexity === 'simple' && !providerOverride) {
+            // potentially use Challenger
+        }
+
+        // 2. Construct Messages
+        const messages = [{ role: 'user', content: prompt }];
+
+        // 3. Call Chat
+        // We pass system_instruction separately or as part of messages?
+        // chat() handles systemInstruction arg.
+        return await this.chat(messages, providerConfig, system_instruction, options);
+    }
+
     async transcribe(audioPath, lang, providerConfig) {
         if (providerConfig.stt === 'deepgram') {
             try {
@@ -100,7 +121,7 @@ class AIRouter {
         return null; // Default (ElevenLabs)
     }
 
-    async chat(messages, providerConfig, systemInstruction) {
+    async chat(messages, providerConfig, systemInstruction, options = {}) {
         // DeepSeek / Challenger Path
         if (providerConfig.llm === 'deepseek-chat') {
             try {
@@ -118,16 +139,17 @@ class AIRouter {
             // Ensure system instruction is in messages if provided separately
             const finalMessages = [...messages];
             if (systemInstruction) {
-                // Check if system message already exists? Usually caller handles it.
-                // If caller passed separate systemInstruction, prepend it.
                 if (!finalMessages.some(m => m.role === 'system')) {
                     finalMessages.unshift({ role: 'system', content: systemInstruction });
                 }
             }
 
             const completion = await openai.chat.completions.create({
-                model: providerConfig.llm === 'gpt-4o' ? 'gpt-4o' : 'gpt-3.5-turbo', // Fallback or strict
+                model: providerConfig.llm === 'gpt-4o' ? 'gpt-4o' : 'gpt-3.5-turbo',
                 messages: finalMessages,
+                response_format: options.response_format,
+                temperature: options.temperature,
+                max_tokens: options.max_tokens
             });
 
             return {

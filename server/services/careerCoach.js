@@ -8,51 +8,91 @@ class CareerCoach {
     async analyzeCV(cvText, jobDescription) {
         if (!cvText || cvText.length < 50) throw new Error("CV text too short");
 
-        const prompt = `
-        Role: Expert ATS Scanner and Recruiter Algorithm.
-        Task: Analyze the provided CV against the Job Description.
+        const systemPrompt = `
+        **IDENTITY:**
+        You are a **Senior Technical Recruiter & ATS Algorithm** at a top-tier Global Firm. 
+        You are cynical, fact-focused, and immune to "fluff". Your job is to FILTER OUT candidates who don't match the job description perfectly.
 
-        Job Description:
-        "${jobDescription.slice(0, 5000)}"
+        **SCORING MATRIX (Total: 100):**
+        - **Hard Skills (40%):** Exact keyword matches from JD to CV.
+        - **Experience Impact (30%):** quantifiable achievements (numbers, $, %) vs generic duties.
+        - **Communication/Soft Skills (20%):** Clarity, structure, language levels (CEFR).
+        - **Format/Professionalism (10%):** Structure, length, typo-free.
 
-        CV Text:
-        "${cvText.slice(0, 5000)}"
+        **NEGATIVE SCORING (PENALTIES):**
+        - "-5 points" for every vague cliché (e.g., "motivated team player", "hard worker").
+        - "-10 points" for missing a MUST-HAVE technical skill from the JD.
+        - "-5 points" for spelling errors.
 
-        Output JSON format only:
+        **TASK:**
+        User will provide a CV and a Job Description. 
+        Analyze them ruthlessly. 
+        Calculated the match score based on the Matrix above.
+
+        **OUTPUT FORMAT (JSON ONLY):**
         {
-            "score": number (0-100),
-            "match_level": "High" | "Medium" | "Low",
-            "missing_keywords": ["string", "string"],
-            "critical_errors": ["string"],
-            "feedback_summary": "string (brief explanation)"
+            "score": Integer (0-100),
+            "match_level": "High (80+)" | "Medium (50-79)" | "Low (<50)",
+            "summary": "2-sentence executive summary for the Hiring Manager.",
+            "hard_skills_analysis": {
+                "score": Integer (0-40),
+                "missing_keywords": ["string", "string"],
+                "matched_keywords": ["string", "string"]
+            },
+            "experience_analysis": {
+                "score": Integer (0-30),
+                "feedback": "string (e.g., 'Too many generic duties, lacks metrics.')"
+            },
+            "soft_skills_analysis": {
+                "score": Integer (0-20),
+                "feedback": "string"
+            },
+            "formatting_analysis": {
+                "score": Integer (0-10),
+                "issues": ["string"]
+            },
+            "red_flags": ["string (e.g., 'Gap in employment', 'Spelling errors')"],
+            "improvement_plan": ["Actionable step 1", "Actionable step 2"]
         }
-        
-        Strictly evaluate keyword matching, formatting, and relevance.
-        
-        **EUROPEAN MARKET STANDARDS (CRITICAL):**
-        - Check for components typical of the European labor market (Europass style).
-        - **Photo & Personal Details:** Unlike the US, professional photos and date of birth are often expected or accepted in many EU countries (Germany, France, Spain). Do NOT penalize them unless unprofessional.
-        - **Languages:** Highly value implementation of CEFR levels (A1-C2).
-        - **Soft Skills:** European recruiters value "Social Competence" and "Mobility".
-        - **Length:** 2 pages is standard/acceptable in Europe (unlike the strict 1-page US rule).
-        
-        If the CV fails European standards (e.g., missing language levels), pass it as a "Missing Keyword" or "Feedback".
+        `;
+
+        const userPrompt = `
+        **JOB DESCRIPTION:**
+        ${jobDescription.slice(0, 4000)}
+
+        **CANDIDATE CV:**
+        ${cvText.slice(0, 4000)}
         `;
 
         try {
+            // Using aiRouter with new options support
             const response = await this.router.routeRequest({
-                prompt: prompt,
-                complexity: 'medium', // Use DeepSeek/GPT-4o mini for analysis
+                prompt: userPrompt,
+                complexity: 'hard', // Force High Logic
                 providerOverride: 'auto',
-                system_instruction: "You are an ATS Scoring Engine. Output only JSON."
+                system_instruction: systemPrompt
+            }, {
+                response_format: { type: "json_object" },
+                temperature: 0.2 // Low temp for factual analysis
             });
 
-            // Attempt to parse JSON from response
-            const cleanJson = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleanJson);
+            // Parse valid JSON
+            return JSON.parse(response.text);
+
         } catch (error) {
             console.error("CareerCoach Analysis Error:", error);
-            throw new Error("Failed to analyze CV");
+            // Fallback for valid frontend structure if AI fails
+            return {
+                score: 0,
+                match_level: "Error",
+                summary: "Analysis failed due to technical issues.",
+                hard_skills_analysis: { missing_keywords: [] },
+                experience_analysis: {},
+                soft_skills_analysis: {},
+                formatting_analysis: {},
+                red_flags: [],
+                improvement_plan: ["Retry analysis"]
+            };
         }
     }
 

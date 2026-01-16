@@ -370,19 +370,24 @@ const careerCoach = require('./services/careerCoach');
 
 app.post('/api/analyze-cv', upload.single('cv'), async (req, res) => {
   const cvFile = req.file;
-  const { jobDescription } = req.body;
+  const { jobDescription, cvText: bufCvText } = req.body; // accept text input
 
-  if (!cvFile || !jobDescription) {
+  if ((!cvFile && !bufCvText) || !jobDescription) {
     if (cvFile) cleanup(cvFile.path);
-    return res.status(400).json({ error: 'Missing CV file or Job Description' });
+    return res.status(400).json({ error: 'Missing CV (File or Text) or Job Description' });
   }
 
   try {
     // 1. Extract Text
-    const cvText = await extractTextFromPDF(fs.readFileSync(cvFile.path));
+    let finalCvText = "";
+    if (cvFile) {
+      finalCvText = await extractTextFromPDF(fs.readFileSync(cvFile.path));
+    } else {
+      finalCvText = bufCvText;
+    }
 
     // 2. AI Analysis
-    const analysis = await careerCoach.analyzeCV(cvText, jobDescription);
+    const analysis = await careerCoach.analyzeCV(finalCvText, jobDescription);
 
     // 3. Save to Supabase (if userId provided)
     const userId = req.body.userId;
