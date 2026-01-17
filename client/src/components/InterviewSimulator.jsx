@@ -79,9 +79,13 @@ const InterviewSimulator = ({ session }) => {
         }
     };
 
+    const [chatProcessing, setChatProcessing] = useState(false);
+
     const handleSendMessage = async (text) => {
+        if (!text.trim()) return;
         const newHistory = [...messages, { role: 'user', content: text }];
         setMessages(newHistory);
+        setChatProcessing(true);
 
         try {
             const { data } = await api.post('/interview/chat', {
@@ -96,6 +100,10 @@ const InterviewSimulator = ({ session }) => {
             if (data.feedback) setCurrentFeedback(data.feedback);
         } catch (e) {
             console.error(e);
+            alert("Error: No pude conectar con Alex (Timeout o Error de Servidor). Intenta de nuevo.");
+            // Optional: Remove user message if failed? Or just leave it.
+        } finally {
+            setChatProcessing(false);
         }
     };
 
@@ -240,10 +248,11 @@ const InterviewSimulator = ({ session }) => {
                             className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500"
                         />
                         <button
+                            disabled={chatProcessing}
                             onClick={() => { handleSendMessage(inputText); setInputText(''); }}
-                            className="w-16 h-16 rounded-full bg-cyan-600 hover:bg-cyan-500 flex items-center justify-center shadow-lg transition-transform active:scale-95"
+                            className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${chatProcessing ? 'bg-slate-700 cursor-not-allowed' : 'bg-cyan-600 hover:bg-cyan-500'}`}
                         >
-                            <ArrowRight />
+                            {chatProcessing ? <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" /> : <ArrowRight />}
                         </button>
                     </div>
                 )}

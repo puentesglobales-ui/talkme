@@ -408,16 +408,20 @@ app.post('/api/analyze-cv', upload.single('cv'), async (req, res) => {
 
     // 3. Save to Supabase (if userId provided)
     if (userId && supabaseAdmin) {
-      const status = analysis.score >= 80 ? 'APPROVED' : 'BLOCKED';
-      // Decrement credits logic could go here
-      await supabaseAdmin
-        .from('profiles')
-        .update({
-          ats_score: analysis.score,
-          ats_status: status,
-          ats_missing_keywords: analysis.hard_skills_analysis?.missing_keywords || []
-        })
-        .eq('id', userId);
+      try { // WRAPPED TO PREVENT CRASH
+        const status = analysis.score >= 80 ? 'APPROVED' : 'BLOCKED';
+        await supabaseAdmin
+          .from('profiles')
+          .update({
+            ats_score: analysis.score,
+            ats_status: status,
+            ats_missing_keywords: analysis.hard_skills_analysis?.missing_keywords || []
+          })
+          .eq('id', userId);
+      } catch (dbErr) {
+        console.warn('DB Update Failed (Non-Critical):', dbErr.message);
+        // Do NOT throw. Continue to return analysis.
+      }
     }
 
     res.json(analysis);
