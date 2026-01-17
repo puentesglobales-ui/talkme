@@ -5,6 +5,7 @@ import api from './services/api';
 import Login from './components/Login';
 
 import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard';
 
 import LanguageSelector from './components/LanguageSelector';
 import StudyPlan from './components/StudyPlan';
@@ -83,14 +84,8 @@ function App() {
 
   const checkProfile = async (userId) => {
     try {
-      // We use our new server endpoint to check connection
-      // But for speed, we might want to check supabase directly if policy allows
-      // or just use the local api service we built.
-      // Let's use the API service.
-      // Use the configured API client which handles the base URL correctly for Prod/Dev
       const response = await api.get(`/profile/${userId}`);
       if (response.data) {
-        // Axios returns data in response.data
         const profile = response.data;
         setOnboardingComplete(!!profile.onboarding_completed);
       } else {
@@ -110,15 +105,8 @@ function App() {
 
   const getRedirectPath = () => {
     if (!session) return "/login";
-
-    const { is_student, payment_completed } = session.user.user_metadata || {};
-    // If Freemium (is_student === false) and NO payment, go to payment setup
-    // Explicitly check false because undefined might be old users or admin
-    if (is_student === false && !payment_completed) {
-      return "/payment-setup";
-    }
-
-    return onboardingComplete ? "/ats-scanner" : "/onboarding";
+    // Bypass obsolete onboarding checks, go straight to hub
+    return "/dashboard";
   };
 
   // Helper for protected routes that should also respect payment gate
@@ -127,6 +115,15 @@ function App() {
 
     const { is_student, payment_completed } = session.user.user_metadata || {};
     if (is_student === false && !payment_completed) {
+      // If specifically Freemium User AND Unpaid -> Block
+      // But maybe we want to let them see Dashboard and block INSIDE tools?
+      // For now, let's keep blocking to be safe, or user will complain "Registros de pago mal"
+      // User said "Registros de pago... mal" maybe meaning he wants to see the tool first.
+      // Let's UNBLOCK dashboard for freemium, but block tools?
+      // To be safe, let's keep strict payment gate for now as per "is_student=false" logic, 
+      // but "Dashboard" might be exceptions?
+      // Let's stick to the rule: Freemium = Pay first. 
+      // If user wants "Data Capture -> Access", he gets "Register -> Pay -> Access".
       return <Navigate to="/payment-setup" />;
     }
 
@@ -139,36 +136,31 @@ function App() {
         <Routes>
           <Route path="/login" element={!session ? <Login /> : <Navigate to={getRedirectPath()} />} />
 
-          <Route path="/languages" element={
+          <Route path="/dashboard" element={
             <ProtectedRoute>
-              {onboardingComplete ? <LanguageSelector /> : <LanguageSelector />}
+              <Dashboard session={session} />
             </ProtectedRoute>
           } />
 
+          {/* Tools */}
+          <Route path="/ats-scanner" element={<ProtectedRoute><ATSScanner session={session} /></ProtectedRoute>} />
+          <Route path="/interview" element={<ProtectedRoute><InterviewSimulator session={session} /></ProtectedRoute>} />
+
+          <Route path="/cv-editor" element={<ProtectedRoute><CVEditor /></ProtectedRoute>} />
+          <Route path="/languages" element={<ProtectedRoute><LanguageSelector /></ProtectedRoute>} />
+          <Route path="/study" element={<ProtectedRoute><StudyPlan /></ProtectedRoute>} />
+
+
+          {/* Utility Routes */}
           <Route path="/onboarding" element={
             <ProtectedRoute>
-              {onboardingComplete ? <Navigate to="/ats-scanner" /> : <OnboardingWizard session={session} onComplete={() => { setOnboardingComplete(true); }} />}
+              <OnboardingWizard session={session} onComplete={() => { setOnboardingComplete(true); }} />
             </ProtectedRoute>
           } />
 
-          <Route path="/study" element={
-            <ProtectedRoute>
-              {onboardingComplete ? <StudyPlan /> : <Navigate to="/languages" />}
-            </ProtectedRoute>
-          } />
-
-          <Route path="/ats-scanner" element={
-            <ProtectedRoute>
-              {onboardingComplete ? <ATSScanner session={session} /> : <Navigate to="/onboarding" />}
-            </ProtectedRoute>
-          } />
-
-          {/* Admin & Billing Routes */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard session={session} /></ProtectedRoute>} />
           <Route path="/payment-setup" element={<ProtectedRoute><PaymentSetup /></ProtectedRoute>} />
 
-          <Route path="/cv-editor" element={<ProtectedRoute><CVEditor /></ProtectedRoute>} />
-          <Route path="/interview" element={<ProtectedRoute><InterviewSimulator session={session} /></ProtectedRoute>} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </div>
