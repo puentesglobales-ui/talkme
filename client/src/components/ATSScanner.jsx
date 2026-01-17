@@ -178,9 +178,49 @@ const ATSScanner = ({ session }) => {
                                 </span>
                             </div>
 
+                            {/* New Score Breakdown */}
+                            {result.breakdown && (
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Hard Skills</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.hard_skills}/40</div>
+                                    </div>
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Experiencia</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.experience}/25</div>
+                                    </div>
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Idiomas</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.languages}/10</div>
+                                    </div>
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Educación</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.education}/10</div>
+                                    </div>
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Soft Skills</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.soft_skills}/10</div>
+                                    </div>
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                        <div className="text-xs text-slate-400 uppercase">Formato</div>
+                                        <div className="text-lg font-bold text-blue-400">{result.breakdown.format}/5</div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Killer Questions / Autoscreening Result */}
+                            {result.killer_questions_check && !result.killer_questions_check.passed && (
+                                <div className="bg-red-900/20 border border-red-500/50 p-4 rounded-xl mb-6">
+                                    <h4 className="text-red-400 font-bold flex items-center gap-2 mb-2">
+                                        <XCircle size={20} /> RECHAZO AUTOMÁTICO (Knockout Rule)
+                                    </h4>
+                                    <p className="text-sm text-red-200">{result.killer_questions_check.reason}</p>
+                                </div>
+                            )}
+
                             {/* Executive Summary */}
                             <div className="bg-slate-900 p-4 rounded-xl text-sm text-slate-300 leading-relaxed border border-slate-700">
-                                <span className="text-blue-400 font-bold block mb-1">Resumen Ejecutivo:</span>
+                                <span className="text-blue-400 font-bold block mb-1">Dictamen Técnico:</span>
                                 {result.summary || result.feedback_summary}
                             </div>
 
