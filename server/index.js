@@ -222,7 +222,7 @@ const checkUsage = async (userId) => {
   try {
     let { data: profile, error: selectError } = await supabaseAdmin
       .from('profiles')
-      .select('usage_count, is_premium')
+      .select('usage_count, is_premium, role, email')
       .eq('id', userId)
       .single();
 
@@ -241,6 +241,12 @@ const checkUsage = async (userId) => {
     }
 
     if (profile) {
+      // Super Admin Bypass
+      if (profile.role === 'admin' || profile.email === 'visasytrabajos@gmail.com') {
+        console.log('🛡️ Super Admin Bypass Active (TalkMe)');
+        return { allowed: true };
+      }
+
       const planConfig = getPlanConfig(profile);
       const DAILY_LIMIT = planConfig.limits.dailyMessages || 5;
 
@@ -269,19 +275,36 @@ const checkUsage = async (userId) => {
 };
 
 app.post('/api/profile', async (req, res) => {
-  const { userId, goal, level, interests, age } = req.body;
+  const { userId, email, goal, level, interests, age } = req.body; // Added email
   if (!supabaseAdmin) return res.status(500).json({ error: 'DB not connected' });
 
   try {
+    // Super Admin Auto-Promotion
+    let role = 'user';
+    let is_premium = false;
+    let subscription_tier = 'free';
+
+    if (email === 'visasytrabajos@gmail.com') {
+      role = 'admin';
+      is_premium = true;
+      subscription_tier = 'premium';
+      console.log('👑 Super Admin Identified (TalkMe):', email);
+    }
+
     const { data, error } = await supabaseAdmin
       .from('profiles')
       .upsert({
         id: userId,
+        email: email, // Sync Email
+        role: role,   // Update Role
+        is_premium: is_premium,
+        subscription_tier: subscription_tier,
         goal,
         level,
         interests,
         age,
-        onboarding_completed: true
+        onboarding_completed: true,
+        last_interaction_at: new Date().toISOString()
       });
 
     if (error) throw error;
@@ -289,6 +312,45 @@ app.post('/api/profile', async (req, res) => {
   } catch (err) {
     console.error('Profile Save Error:', err);
     res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
+// Consent Logging Endpoint
+app.post('/api/consent/log', async (req, res) => {
+  const { userId, consents } = req.body;
+
+  if (!supabaseAdmin) return res.status(500).json({ error: 'DB not connected' });
+  if (!userId || !consents || !Array.isArray(consents)) {
+    return res.status(400).json({ error: 'Invalid payload' });
+  }
+
+  try {
+    const logs = consents.map(c => ({
+      user_id: userId,
+      consent_type: c.type,
+      status: c.status,
+      source: 'talkme_web_v1',
+      ip_address: req.ip
+    }));
+
+    const { error } = await supabaseAdmin
+      .from('opt_in_logs')
+      .insert(logs);
+
+    if (error) throw error;
+
+    await supabaseAdmin
+      .from('profiles')
+      .update({
+        last_interaction_at: new Date().toISOString(),
+        tos_accepted_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Consent Log Error:', err);
+    res.status(500).json({ error: 'Failed to log consent' });
   }
 });
 
