@@ -1,58 +1,94 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, ArrowLeft, Globe } from 'lucide-react';
+import { Loader2, ArrowLeft, Globe, CheckSquare, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [accessCode, setAccessCode] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
     const [accountType, setAccountType] = useState('student');
     const [message, setMessage] = useState('');
+
+    // GDPR Consent States
+    const [consentTerms, setConsentTerms] = useState(false); // Mandatory
+    const [consentFuture, setConsentFuture] = useState(false); // Optional
+
     const navigate = useNavigate();
+
+    const logConsent = async (userId) => {
+        try {
+            await api.post('/consent/log', {
+                userId,
+                consents: [
+                    { type: 'process_specific', status: consentTerms }, // Terms for THIS process
+                    { type: 'future_matching', status: consentFuture } // Future reuse
+                ]
+            });
+            console.log("Consent logged successfully");
+        } catch (err) {
+            console.error("Failed to log consent", err);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        if (isSignUp && !consentTerms) {
+            setMessage("Debes aceptar los Términos para continuar.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/languages'
+                }
+            });
+            if (error) throw error;
+            // Note: Consent logging for OAuth happens post-redirect callback usually, 
+            // or we assume if they click this button they accepted the marked checkboxes.
+            // For MVP, we can't easily hook into the callback here without a new route.
+            // Ideally, we'd log this ON specific 'Sign Up' intent, but OAuth blends them.
+        } catch (error) {
+            setMessage(error.message);
+            setLoading(false);
+        }
+    };
 
     const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
 
-        console.log("Intentando auth:", { isSignUp, email, accountType });
+        if (isSignUp && !consentTerms) {
+            setLoading(false);
+            setMessage("Debes aceptar los Términos y Condiciones obligatorios.");
+            return;
+        }
 
         try {
             if (isSignUp) {
-                // Validación básica
-                /*
-                if (accountType === 'student' && accessCode.length < 6) {
-                    throw new Error('El código debe tener 6 caracteres.');
-                }
-                */
-
-                // SIMPLIFICADO: Sin opciones extra para probar si es el Redirect lo que falla
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
-                    // Eliminamos 'options' temporalmente para aislar el error 'Anonymous sign-ins disabled'
-                    // options: { ... } 
                 });
 
-                if (error) {
-                    console.error("Supabase Error:", error);
-                    throw error;
+                if (error) throw error;
+
+                if (data.user) {
+                    await logConsent(data.user.id);
                 }
 
                 console.log("Registro Exitoso:", data);
-                setMessage('¡Registro exitoso! Si no entras directo, revisa tu email.');
+                setMessage('¡Registro exitoso! Revisa tu email para confirmar.');
 
-                // Auto login workaround or redirect logic
                 if (data.session) {
                     if (accountType === 'freemium') navigate('/payment-setup');
                     else navigate('/languages');
-                } else {
-                    // Caso donde requiere confirmación de email (común en producción)
-                    setMessage('Registro creado. Por favor confirma tu email para ingresar.');
                 }
 
             } else {
@@ -65,7 +101,7 @@ export default function Login() {
                 navigate('/languages');
             }
         } catch (error) {
-            console.error("Catch Error:", error);
+            console.error("Auth Error:", error);
             setMessage(error.message || "Error desconocido");
         } finally {
             setLoading(false);
@@ -92,7 +128,7 @@ export default function Login() {
                 transition={{ duration: 0.5 }}
                 className="bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-800 relative z-10"
             >
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-6">
                     <div className="w-16 h-16 bg-cyan-600/20 rounded-2xl flex items-center justify-center border border-cyan-500/20">
                         <Globe className="text-cyan-400 w-8 h-8" />
                     </div>
@@ -103,7 +139,7 @@ export default function Login() {
                 </h1>
 
                 {/* LOGIN / SIGNUP TOGGLE */}
-                <div className="flex justify-center gap-4 mb-8 bg-slate-950 p-1 rounded-xl border border-slate-800 mt-6">
+                <div className="flex justify-center gap-4 mb-6 bg-slate-950 p-1 rounded-xl border border-slate-800 mt-6">
                     <button
                         onClick={() => setIsSignUp(false)}
                         className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${!isSignUp ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
@@ -118,40 +154,27 @@ export default function Login() {
                     </button>
                 </div>
 
-                {/* DEMO BYPASS BUTTON */}
+                {/* GOOGLE LOGIN */}
                 <button
-                    onClick={() => {
-                        localStorage.setItem('demo_mode', 'true');
-                        window.location.reload();
-                    }}
-                    className="w-full mb-4 py-2 border border-yellow-600/50 text-yellow-500 rounded-xl text-xs font-bold hover:bg-yellow-900/20 transition-all flex items-center justify-center gap-2"
+                    onClick={handleGoogleLogin}
+                    className="w-full mb-4 py-3 bg-white text-slate-900 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-lg"
                 >
-                    🚀 ACCESO DEMO (ADMIN/INVITADO)
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                    </svg>
+                    Continuar con Google
                 </button>
 
-                <form onSubmit={handleAuth} className="space-y-5">
-                    {isSignUp && (
-                        <div className="flex flex-col gap-2 mb-4">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tipo de cuenta</label>
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setAccountType('student')}
-                                    className={`flex-1 py-3 px-2 rounded-xl text-sm font-semibold border transition-all ${accountType === 'student' ? 'bg-cyan-600/10 border-cyan-500/50 text-cyan-400' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'}`}
-                                >
-                                    Soy Alumno
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setAccountType('freemium')}
-                                    className={`flex-1 py-3 px-2 rounded-xl text-sm font-semibold border transition-all ${accountType === 'freemium' ? 'bg-indigo-600/10 border-indigo-500/50 text-indigo-400' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'}`}
-                                >
-                                    Cuenta Freemium
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-slate-700"></div>
+                    <span className="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase">O usa tu email</span>
+                    <div className="flex-grow border-t border-slate-700"></div>
+                </div>
 
+                <form onSubmit={handleAuth} className="space-y-5 mt-4">
                     <div className="space-y-4">
                         <div>
                             <label className="block text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">Email</label>
@@ -164,8 +187,6 @@ export default function Login() {
                                 required
                             />
                         </div>
-
-                        {/* Access Code removed for Open MVP */}
 
                         <div>
                             <label className="block text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">Contraseña</label>
@@ -180,6 +201,27 @@ export default function Login() {
                         </div>
                     </div>
 
+                    {isSignUp && (
+                        <div className="space-y-3 bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+                            {/* OBLIGATORIO */}
+                            <div className="flex items-start gap-3 cursor-pointer" onClick={() => setConsentTerms(!consentTerms)}>
+                                {consentTerms ? <CheckSquare className="text-cyan-400 shrink-0 mt-0.5" size={18} /> : <Square className="text-slate-500 shrink-0 mt-0.5" size={18} />}
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    <span className="font-bold text-cyan-400">OBLIGATORIO:</span> Acepto que mis datos sean tratados únicamente para participar en los procesos de selección relacionados con esta oferta.
+                                </p>
+                            </div>
+
+                            {/* OPCIONAL */}
+                            <div className="flex items-start gap-3 cursor-pointer" onClick={() => setConsentFuture(!consentFuture)}>
+                                {consentFuture ? <CheckSquare className="text-green-400 shrink-0 mt-0.5" size={18} /> : <Square className="text-slate-500 shrink-0 mt-0.5" size={18} />}
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                    <span className="font-bold text-green-400">OPCIONAL (Recomendado):</span> Autorizo a Puentes Globales a conservar mi perfil para <strong>futuros procesos de selección</strong> adecuados a mi perfil.
+                                    <br /><span className="text-[10px] text-slate-500 italic">Podrás revocar esto en cualquier momento.</span>
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     {message && (
                         <div className={`p-4 rounded-xl text-sm flex items-start gap-2 ${message.includes('exitoso') || message.includes('creado') ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                             <span>{message}</span>
@@ -188,7 +230,7 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || (isSignUp && !consentTerms)}
                         className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-cyan-900/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading && <Loader2 className="animate-spin" size={20} />}
@@ -197,12 +239,14 @@ export default function Login() {
                 </form>
 
                 <div className="mt-8 text-center text-sm text-slate-500">
-                    {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
                     <button
-                        onClick={() => setIsSignUp(!isSignUp)}
-                        className="ml-2 text-cyan-400 font-bold hover:text-cyan-300 transition-colors"
+                        onClick={() => {
+                            localStorage.setItem('demo_mode', 'true');
+                            window.location.reload();
+                        }}
+                        className="text-xs font-bold text-slate-600 hover:text-slate-400 mb-4 block w-full"
                     >
-                        {isSignUp ? 'Ingresa aquí' : 'Regístrate gratis'}
+                        Acceso de Invitado (Solo Demo)
                     </button>
                 </div>
             </motion.div>
