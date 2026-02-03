@@ -50,9 +50,7 @@ const ATSScanner = ({ session }) => {
             }
 
             // Always call the Real AI Backend
-            const response = await api.post('/analyze-cv', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const response = await api.post('/analyze-cv', formData);
 
             setResult(response.data);
 
