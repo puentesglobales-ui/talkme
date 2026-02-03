@@ -206,12 +206,12 @@ const getSystemMessage = (scenarioId) => {
 
 const { getPlanConfig } = require('./services/profileRules');
 
-const checkUsage = async (userId) => {
+const checkUsage = async (userId, usageType = 'general') => {
   if (!userId || !supabaseAdmin) return { allowed: true };
   try {
     let { data: profile, error: selectError } = await supabaseAdmin
       .from('profiles')
-      .select('usage_count, is_premium')
+      .select('usage_count, is_premium, role, email, credits_ats, credits_roleplay')
       .eq('id', userId)
       .single();
 
@@ -219,7 +219,7 @@ const checkUsage = async (userId) => {
       console.log('⚠️ Profile missing. Creating default profile...');
       const { data: newProfile, error: createError } = await supabaseAdmin
         .from('profiles')
-        .insert([{ id: userId, usage_count: 0, is_premium: false }])
+        .insert([{ id: userId, usage_count: 0, is_premium: false, credits_ats: 1, credits_roleplay: 20 }])
         .select()
         .single();
       if (createError) {
@@ -230,33 +230,45 @@ const checkUsage = async (userId) => {
     }
 
     if (profile) {
-      const planConfig = getPlanConfig(profile);
-      const DAILY_LIMIT = planConfig.limits.dailyMessages || 5;
-
-      console.log(`📊 Usage: ${profile.usage_count}/${DAILY_LIMIT} | Premium: ${profile.is_premium} | Plan: ${planConfig.planId}`);
-
-      if (profile.role === 'admin' || profile.email === 'visasytrabajos@gmail.com') {
-        console.log('🛡️ Super Admin Bypass Active');
+      // 1. Super Admin / Premium Bypass
+      if (profile.role === 'admin' || profile.email === 'visasytrabajos@gmail.com' || profile.is_premium) {
         return { allowed: true };
       }
 
-      if (!profile.is_premium && profile.usage_count >= DAILY_LIMIT) {
-        console.log('🛑 Limit Reached. Blocking.');
+      // 2. Specific Credit Check
+      let hasCredit = false;
+      let limitMsg = '';
+
+      if (usageType === 'ats') {
+        hasCredit = (profile.credits_ats || 0) > 0;
+        limitMsg = 'Has usado tu escaneo gratuito de CV. Actualiza a PRO para ilimitado.';
+      } else if (usageType === 'roleplay') {
+        hasCredit = (profile.credits_roleplay || 0) > 0;
+        limitMsg = 'Has alcanzado el límite de 20 mensajes de Roleplay gratuito.';
+      } else {
+        // Fallback or other types checking general usage_count if needed
+        hasCredit = true;
+      }
+
+      if (!hasCredit) {
+        console.log(`🛑 ${usageType.toUpperCase()} Limit Reached for ${userId}`);
         return {
           allowed: false,
           status: 402,
-          message: `Has alcanzado tu límite diario de ${DAILY_LIMIT} mensajes. Actualiza tu plan para continuar.`
+          message: limitMsg
         };
       }
 
-      supabaseAdmin.rpc('increment_usage', { user_id: userId }).then(({ error }) => {
-        if (error) console.error('Error Incrementing Usage:', error);
-      });
+      // Decrement logic is handled by caller or we can do it here via RPC
+      // For atomicity, usually better via RPC, but let's assume caller triggers it 
+      // OR we call the specific decrement RPC here for convenience if 'allowed'.
+      // Note: If we decrement HERE, we must ensure we don't double count if the operation fails later.
+      // Strategy: Check here, Decrement after success in the endpoint.
 
       return { allowed: true };
     }
   } catch (err) {
-    console.error('Freemium Check Check Error:', err);
+    console.error('Freemium Check Error:', err);
     return { allowed: true };
   }
   return { allowed: true };
@@ -377,12 +389,18 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Messages array is required' });
     }
 
-    const usageCheck = await checkUsage(userId);
+    const usageCheck = await checkUsage(userId, 'roleplay');
     if (!usageCheck.allowed) {
       return res.status(usageCheck.status || 402).json({
         error: 'Limit Reached',
-        message: usageCheck.message || 'Has alcanzado tu límite.'
+        message: usageCheck.message
       });
+    }
+
+    // Decrement Credit (Async)
+    if (userId && supabaseAdmin) {
+      supabaseAdmin.rpc('decrement_credit', { p_user_id: userId, p_type: 'roleplay' })
+        .then(({ error }) => { if (error) console.error('Error decrementing roleplay credit:', error); });
     }
 
     let systemMsg = { role: 'system', content: 'You are a helpful tutor.' };
@@ -452,16 +470,24 @@ app.post('/api/analyze-cv', upload.single('cv'), async (req, res) => {
     let userTier = 'free';
 
     if (userId && supabaseAdmin) {
+      // CREDIT CHECK
+      const usageCheck = await checkUsage(userId, 'ats');
+      if (!usageCheck.allowed) {
+        if (cvFile) cleanup(cvFile.path);
+        return res.status(402).json({
+          error: 'Limit Reached',
+          message: usageCheck.message
+        });
+      }
+
       const { data: userProfile } = await supabaseAdmin
         .from('profiles')
-        .select('subscription_tier, credits_remaining')
+        .select('subscription_tier')
         .eq('id', userId)
         .single();
 
       if (userProfile) {
         userTier = userProfile.subscription_tier || 'free';
-        // TODO: Enforce credit limits here later
-        // if (userTier === 'free' && userProfile.credits_remaining <= 0) ...
       }
     }
 
@@ -479,6 +505,10 @@ app.post('/api/analyze-cv', upload.single('cv'), async (req, res) => {
             ats_missing_keywords: analysis.hard_skills_analysis?.missing_keywords || []
           })
           .eq('id', userId);
+
+        // Decrement ATS Credit
+        await supabaseAdmin.rpc('decrement_credit', { p_user_id: userId, p_type: 'ats' });
+
       } catch (dbErr) {
         console.warn('DB Update Failed (Non-Critical):', dbErr.message);
         // Do NOT throw. Continue to return analysis.
