@@ -222,7 +222,7 @@ const checkUsage = async (userId) => {
   try {
     let { data: profile, error: selectError } = await supabaseAdmin
       .from('profiles')
-      .select('usage_count, is_premium, role, email')
+      .select('usage_count, is_premium, role, email, demo_started_at')
       .eq('id', userId)
       .single();
 
@@ -241,29 +241,41 @@ const checkUsage = async (userId) => {
     }
 
     if (profile) {
-      // Super Admin Bypass
-      if (profile.role === 'admin' || profile.email === 'visasytrabajos@gmail.com') {
-        console.log('🛡️ Super Admin Bypass Active (TalkMe)');
+      // 1. Super Admin / Premium Bypass
+      if (profile.role === 'admin' || profile.email === 'visasytrabajos@gmail.com' || profile.is_premium) {
+        // console.log('🛡️ Super Admin/Premium Bypass Active');
         return { allowed: true };
       }
 
-      const planConfig = getPlanConfig(profile);
-      const DAILY_LIMIT = planConfig.limits.dailyMessages || 5;
+      // 2. Demo Timer Check (5 Minutes)
+      const now = new Date();
+      let startTime = profile.demo_started_at ? new Date(profile.demo_started_at) : null;
 
-      console.log(`📊 Usage: ${profile.usage_count}/${DAILY_LIMIT} | Premium: ${profile.is_premium} | Plan: ${planConfig.planId}`);
-
-      if (!profile.is_premium && profile.usage_count >= DAILY_LIMIT) {
-        console.log('🛑 Limit Reached. Blocking.');
-        return {
-          allowed: false,
-          status: 402,
-          message: `Has alcanzado tu límite diario de ${DAILY_LIMIT} mensajes. Actualiza tu plan para continuar.`
-        };
+      if (!startTime) {
+        // First interaction: Start the timer
+        console.log('⏱️ Starting 5-minute demo timer for:', userId);
+        const { error: updateError } = await supabaseAdmin
+          .from('profiles')
+          .update({ demo_started_at: now.toISOString() })
+          .eq('id', userId);
+        if (updateError) console.error('Error setting demo timer:', updateError);
+        startTime = now;
       }
 
-      supabaseAdmin.rpc('increment_usage', { user_id: userId }).then(({ error }) => {
-        if (error) console.error('Error Incrementing Usage:', error);
-      });
+      const diffMs = now - startTime;
+      const minutesUsed = Math.floor(diffMs / 60000);
+      const LIMIT_MINUTES = 5;
+
+      console.log(`⏳ Demo Usage: ${minutesUsed}m / ${LIMIT_MINUTES}m`);
+
+      if (minutesUsed >= LIMIT_MINUTES) {
+        console.log('🛑 Demo Time Expired.');
+        return {
+          allowed: false,
+          status: 402, // Payment Required
+          message: `Tu demo gratuita de 5 minutos ha expirado. Suscríbete para continuar sin límites.`
+        };
+      }
 
       return { allowed: true };
     }
