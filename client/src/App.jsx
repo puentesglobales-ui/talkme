@@ -15,6 +15,7 @@ import PaymentSetup from './components/PaymentSetup';
 import ATSScanner from './components/ATSScanner';
 import CVEditor from './components/CVEditor';
 import InterviewSimulator from './components/InterviewSimulator';
+import PsychometricTest from './components/PsychometricTest';
 
 
 function App() {
@@ -145,6 +146,7 @@ function App() {
           {/* Tools */}
           <Route path="/ats-scanner" element={<ProtectedRoute><ATSScanner session={session} /></ProtectedRoute>} />
           <Route path="/interview" element={<ProtectedRoute><InterviewSimulator session={session} /></ProtectedRoute>} />
+          <Route path="/psychometric" element={<ProtectedRoute><PsychometricTest /></ProtectedRoute>} />
 
           <Route path="/cv-editor" element={<ProtectedRoute><CVEditor /></ProtectedRoute>} />
           <Route path="/languages" element={<ProtectedRoute><LanguageSelector /></ProtectedRoute>} />

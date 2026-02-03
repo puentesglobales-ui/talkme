@@ -4,25 +4,11 @@ import { Link } from 'react-router-dom';
 import WhatsAppWidget from './WhatsAppWidget';
 import {
     ArrowRight, Globe, MessageCircle, Calendar, Briefcase,
-    CheckCircle, Mic, Star, Menu, X, FileText, UserCheck, Bot
+    CheckCircle, Mic, Star, Menu, X, FileText, UserCheck, Bot, Brain, Search
 } from 'lucide-react';
 
 const LandingPage = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const fadeInUp = {
-        initial: { opacity: 0, y: 20 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6 }
-    };
-
-    const staggerContainer = {
-        animate: {
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
 
     return (
         <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500/30">
@@ -39,12 +25,10 @@ const LandingPage = () => {
                         </span>
                     </Link>
 
-
-
                     {/* CTA Button */}
                     <div className="hidden md:flex items-center gap-4">
-                        <Link to="/login" className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 rounded-full font-bold text-lg shadow-lg shadow-cyan-500/40 transition-all flex items-center gap-2">
-                            Crear Cuenta <ArrowRight size={20} />
+                        <Link to="/login" className="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-full font-bold text-base shadow-lg shadow-cyan-500/40 transition-all flex items-center gap-2">
+                            Crear Cuenta <ArrowRight size={18} />
                         </Link>
                     </div>
 
@@ -71,7 +55,7 @@ const LandingPage = () => {
 
             {/* 1. HERO SECTION */}
             <section className="relative min-h-[90vh] flex items-center justify-center pt-24 overflow-hidden bg-slate-950">
-                {/* Abstract Background (NO PHOTOS) */}
+                {/* Abstract Background */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px] filter mix-blend-screen"></div>
                     <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] filter mix-blend-screen"></div>
@@ -80,94 +64,127 @@ const LandingPage = () => {
 
                 <div className="relative z-10 container mx-auto px-6 text-center">
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-300 mb-10 backdrop-blur-sm">
-                            <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22d3ee]"></span>
-                            <span className="text-base font-bold tracking-wide uppercase">Plataforma Integral de Carrera</span>
-                        </div>
 
-                        <h1 className="text-6xl md:text-8xl font-black mb-10 leading-tight tracking-tight text-white">
-                            Emigrar no es suerte.<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 drop-shadow-sm">
-                                Es Estrategia.
-                            </span>
+                        <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight tracking-tight text-white">
+                            Emigrar con <span className="text-cyan-400">confianza</span> es posible
                         </h1>
 
-                        <p className="text-2xl md:text-3xl text-slate-300 font-light max-w-4xl mx-auto mb-16 leading-relaxed">
-                            La primera suite de herramientas impulsadas por IA diseñada específicamente para profesionales latinos que buscan su futuro en Europa.
+                        <p className="text-xl md:text-2xl text-slate-300 font-light max-w-4xl mx-auto mb-10 leading-relaxed">
+                            No es improvisar, es planificar. Tu futuro en Europa comienza hoy.
                         </p>
 
-                        {/* MAIN UTILITIES GRID (Direct Access) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
-                            {/* Card 1: ATS */}
-                            <Link to="/ats-scanner" className="group p-8 bg-slate-900 border border-slate-800 rounded-3xl hover:border-cyan-500/50 hover:bg-slate-800/80 transition-all cursor-pointer hover:shadow-[0_0_30px_rgba(34,211,238,0.1)]">
-                                <div className="w-16 h-16 bg-cyan-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    <FileText className="text-cyan-400 w-8 h-8" />
-                                </div>
-                                <h3 className="text-3xl font-bold text-white mb-3">Scanner ATS</h3>
-                                <p className="text-slate-400 text-lg">Analiza tu CV contra ofertas reales y descubre por qué no te llaman.</p>
-                                <div className="mt-6 flex items-center text-cyan-400 text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Probar ahora <ArrowRight size={20} className="ml-2" />
-                                </div>
-                            </Link>
-
-                            {/* Card 2: Interview */}
-                            <Link to="/interview" className="group p-8 bg-slate-900 border border-slate-800 rounded-3xl hover:border-blue-500/50 hover:bg-slate-800/80 transition-all cursor-pointer hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-                                <div className="w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    <UserCheck className="text-blue-400 w-8 h-8" />
-                                </div>
-                                <h3 className="text-3xl font-bold text-white mb-3">Roleplay Entrevista</h3>
-                                <p className="text-slate-400 text-lg">Simula entrevistas técnicas y de RRHH con feedback en tiempo real.</p>
-                                <div className="mt-6 flex items-center text-blue-400 text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Practicar ahora <ArrowRight size={20} className="ml-2" />
-                                </div>
-                            </Link>
-
-                            {/* Card 3: Talkme */}
-                            <a href="https://www.puentesglobales.com/home/#/login" target="_blank" rel="noopener noreferrer" className="group p-8 bg-slate-900 border border-slate-800 rounded-3xl hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all cursor-pointer hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]">
-                                <div className="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    <Bot className="text-indigo-400 w-8 h-8" />
-                                </div>
-                                <h3 className="text-3xl font-bold text-white mb-3">Talkme AI</h3>
-                                <p className="text-slate-400 text-lg">Tu coach de idiomas inteligente disponible 24/7.</p>
-                                <div className="mt-6 flex items-center text-indigo-400 text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Chatear ahora <ArrowRight size={20} className="ml-2" />
-                                </div>
+                        {/* HERO BUTTONS */}
+                        <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
+                            {/* Primary: Job Search */}
+                            <a
+                                href="https://www.puentesglobales.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-8 py-4 bg-white text-slate-900 rounded-full font-extrabold text-lg hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                            >
+                                <Briefcase className="text-cyan-600" size={24} />
+                                Empieza aquí tu búsqueda laboral
                             </a>
+
+                            {/* Secondary: Talkme */}
+                            <a
+                                href="https://www.puentesglobales.com/home/#/login"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-8 py-4 bg-slate-800 border border-slate-700 text-white rounded-full font-bold text-lg hover:bg-slate-700 transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                            >
+                                <Bot className="text-indigo-400" size={24} />
+                                Probar Talkme Ahora
+                            </a>
+                        </div>
+
+                        {/* 4 PILLARS GRID */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto text-left">
+
+                            {/* 1. Job Search */}
+                            <a href="https://www.puentesglobales.com" target="_blank" rel="noopener noreferrer" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-cyan-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Search size={100} className="text-cyan-500" />
+                                </div>
+                                <div className="w-14 h-14 bg-cyan-600/20 rounded-xl flex items-center justify-center mb-4">
+                                    <Search className="text-cyan-400 w-7 h-7" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Búsqueda Laboral</h3>
+                                <p className="text-slate-400">Accede a ofertas exclusivas en Europa validadas por expertos.</p>
+                            </a>
+
+                            {/* 2. ATS Scanner */}
+                            <Link to="/ats-scanner" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-blue-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <FileText size={100} className="text-blue-500" />
+                                </div>
+                                <div className="w-14 h-14 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                                    <FileText className="text-blue-400 w-7 h-7" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Scanner ATS</h3>
+                                <p className="text-slate-400">Optimiza tu CV para superar los filtros automáticos de los reclutadores.</p>
+                            </Link>
+
+                            {/* 3. Roleplay */}
+                            <Link to="/interview" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-purple-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <UserCheck size={100} className="text-purple-500" />
+                                </div>
+                                <div className="w-14 h-14 bg-purple-600/20 rounded-xl flex items-center justify-center mb-4">
+                                    <UserCheck className="text-purple-400 w-7 h-7" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Roleplay con IA</h3>
+                                <p className="text-slate-400">Practica entrevistas técnicas y de RRHH en tiempo real.</p>
+                            </Link>
+
+                            {/* 4. Psychometric Test */}
+                            <Link to="/psychometric" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-pink-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Brain size={100} className="text-pink-500" />
+                                </div>
+                                <div className="w-14 h-14 bg-pink-600/20 rounded-xl flex items-center justify-center mb-4">
+                                    <Brain className="text-pink-400 w-7 h-7" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Test Psicométrico</h3>
+                                <p className="text-slate-400">Descubre tu perfil profesional ideal para el mercado global.</p>
+                            </Link>
+
                         </div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* 2. SOMOS PUENTES GLOBALES (Modernizado - SIN FOTOS) */}
-            <section className="py-28 bg-slate-950 relative border-t border-slate-900">
+            {/* 2. SOMOS PUENTES GLOBALES (Modernizado) */}
+            <section className="py-24 bg-slate-950 relative border-t border-slate-900">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                    <div className="text-center mb-16">
+                        <h2 className="text-cyan-500 font-bold tracking-widest uppercase mb-4 text-sm">SOBRE NOSOTROS</h2>
+                        <h3 className="text-4xl md:text-6xl font-black text-white">Somos Puentes</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>
-                            <h2 className="text-cyan-500 font-bold tracking-widest uppercase mb-4 text-lg">Metodología Comprobada</h2>
-                            <h3 className="text-4xl md:text-6xl font-black mb-8 leading-none">
-                                Más que una plataforma,<br />tu ecosistema de éxito.
-                            </h3>
-                            <p className="text-2xl text-slate-400 mb-8 leading-relaxed font-light">
-                                En Puentes Globales no solo te damos herramientas; te damos un sistema. Integramos tecnología de punta con la experiencia humana.
+                            <p className="text-xl text-slate-400 mb-8 leading-relaxed font-light">
+                                En Puentes Globales no solo te damos herramientas; te damos un sistema. Integramos tecnología de punta con la experiencia humana para asegurar tu éxito migratorio y profesional.
                             </p>
                             <ul className="space-y-6">
                                 <li className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><CheckCircle size={20} /></div>
-                                    <span className="text-slate-200 text-xl">Validación de perfil profesional (Europa & USA)</span>
+                                    <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400"><CheckCircle size={20} /></div>
+                                    <span className="text-slate-200 text-lg">Validación de perfil profesional (Europa & USA)</span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><CheckCircle size={20} /></div>
-                                    <span className="text-slate-200 text-xl">Entrenamiento de soft-skills y confianza</span>
+                                    <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400"><CheckCircle size={20} /></div>
+                                    <span className="text-slate-200 text-lg">Entrenamiento de soft-skills y confianza</span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><CheckCircle size={20} /></div>
-                                    <span className="text-slate-200 text-xl">Networking estratégico</span>
+                                    <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400"><CheckCircle size={20} /></div>
+                                    <span className="text-slate-200 text-lg">Networking estratégico</span>
                                 </li>
                             </ul>
                         </div>
 
                         {/* Logo Puentes Globales */}
-                        <div className="relative h-[500px] w-full bg-slate-900 rounded-3xl border border-cyan-500/20 overflow-hidden flex items-center justify-center group p-12 shadow-2xl">
+                        <div className="relative h-[400px] w-full bg-slate-900 rounded-3xl border border-cyan-500/20 overflow-hidden flex items-center justify-center group p-12 shadow-2xl">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_60%)]"></div>
                             <img
                                 src="/logo-new.png"
