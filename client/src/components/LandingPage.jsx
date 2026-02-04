@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import WhatsAppWidget from './WhatsAppWidget';
 import {
     ArrowRight, Globe, MessageCircle, Calendar, Briefcase,
-    CheckCircle, Mic, Star, Menu, X, FileText, UserCheck, Bot, Brain, Search
+    CheckCircle, Mic, Star, Menu, X, FileText, UserCheck, Bot, Brain, Search, Sparkles
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -114,7 +114,7 @@ const LandingPage = () => {
                             </a>
 
                             {/* 2. ATS Scanner */}
-                            <Link to="/ats-scanner" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-blue-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                            <a href="https://ats-career-client.vercel.app/#/login" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-blue-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <FileText size={100} className="text-blue-500" />
                                 </div>
@@ -123,7 +123,7 @@ const LandingPage = () => {
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Scanner ATS</h3>
                                 <p className="text-slate-400">Optimiza tu CV para superar los filtros automáticos de los reclutadores.</p>
-                            </Link>
+                            </a>
 
                             {/* 3. Roleplay */}
                             <Link to="/interview" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-purple-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
@@ -219,6 +219,17 @@ const LandingPage = () => {
                     <p>&copy; 2026 Puentes Globales. Todos los derechos reservados.</p>
                 </div>
             </footer>
+            {/* FLOATING CTA for ATS - Added per user request */}
+            <div className="fixed bottom-24 right-6 z-40">
+                <a
+                    href="https://ats-career-client.vercel.app/#/login"
+                    className="flex items-center gap-3 px-6 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-500/30 transition-all hover:scale-105 font-bold border border-blue-400/30 animate-pulse"
+                >
+                    <Sparkles size={20} className="text-yellow-300 fill-yellow-300" />
+                    <span>Utiliza nuestro: Simulador ATS y Revolución de CV con IA</span>
+                </a>
+            </div>
+
             <WhatsAppWidget />
         </div>
     );
