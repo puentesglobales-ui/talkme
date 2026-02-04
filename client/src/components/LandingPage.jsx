@@ -27,9 +27,9 @@ const LandingPage = () => {
 
                     {/* CTA Button */}
                     <div className="hidden md:flex items-center gap-4">
-                        <Link to="/login" className="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-full font-bold text-base shadow-lg shadow-cyan-500/40 transition-all flex items-center gap-2">
+                        <a href="https://ats-career-client.vercel.app/#/login" className="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-full font-bold text-base shadow-lg shadow-cyan-500/40 transition-all flex items-center gap-2">
                             Crear Cuenta <ArrowRight size={18} />
-                        </Link>
+                        </a>
                     </div>
 
                     {/* Mobile Menu Toggle */}
@@ -47,7 +47,7 @@ const LandingPage = () => {
                     >
                         <div className="px-6 py-6 flex flex-col gap-6 text-lg">
                             <a href="https://www.puentesglobales.com/home/#/login" target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-cyan-400 py-2 border-b border-white/5" onClick={() => setIsMenuOpen(false)}>Talkme AI (Idiomas)</a>
-                            <Link to="/login" className="text-cyan-400 font-bold py-2">Ingresar / Registrarse</Link>
+                            <a href="https://ats-career-client.vercel.app/#/login" className="text-cyan-400 font-bold py-2">Ingresar / Registrarse</a>
                         </div>
                     </motion.div>
                 )}
@@ -126,7 +126,8 @@ const LandingPage = () => {
                             </a>
 
                             {/* 3. Roleplay */}
-                            <Link to="/interview" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-purple-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                            {/* 3. Roleplay */}
+                            <a href="https://ats-career-client.vercel.app/#/login" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-purple-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <UserCheck size={100} className="text-purple-500" />
                                 </div>
@@ -135,10 +136,11 @@ const LandingPage = () => {
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Roleplay con IA</h3>
                                 <p className="text-slate-400">Practica entrevistas técnicas y de RRHH en tiempo real.</p>
-                            </Link>
+                            </a>
 
                             {/* 4. Psychometric Test */}
-                            <Link to="/psychometric" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-pink-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                            {/* 4. Psychometric Test */}
+                            <a href="https://ats-career-client.vercel.app/#/login" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-pink-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <Brain size={100} className="text-pink-500" />
                                 </div>
@@ -147,7 +149,7 @@ const LandingPage = () => {
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Test Psicométrico</h3>
                                 <p className="text-slate-400">Descubre tu perfil profesional ideal para el mercado global.</p>
-                            </Link>
+                            </a>
 
                         </div>
                     </motion.div>
@@ -203,9 +205,9 @@ const LandingPage = () => {
                 <div className="relative container mx-auto px-6 text-center z-10">
                     <h2 className="text-5xl md:text-7xl font-bold mb-10 text-white">¿Listo para dar el salto?</h2>
                     <div className="flex flex-col md:flex-row justify-center gap-6">
-                        <Link to="/login" className="px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-xl hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all transform hover:-translate-y-1">
+                        <a href="https://ats-career-client.vercel.app/#/login" className="px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold text-xl hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all transform hover:-translate-y-1">
                             Crear Cuenta
-                        </Link>
+                        </a>
                         <a href="https://calendly.com/puentesglobales" target="_blank" rel="noopener noreferrer" className="px-10 py-5 bg-transparent border border-white/10 text-white rounded-full font-bold text-xl hover:bg-white/5 transition-all outline-none focus:ring-2 focus:ring-cyan-500">
                             Agendar Mentoría
                         </a>
