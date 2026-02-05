@@ -75,15 +75,13 @@ const LandingPage = () => {
 
                         {/* HERO BUTTONS */}
                         <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
-                            {/* Primary: Job Search */}
+                            {/* Primary: Build CV with AI */}
                             <a
-                                href="https://www.puentesglobales.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="https://ats-career-client.vercel.app/#/login"
                                 className="px-8 py-4 bg-white text-slate-900 rounded-full font-extrabold text-lg hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center gap-2 transform hover:-translate-y-1"
                             >
-                                <Briefcase className="text-cyan-600" size={24} />
-                                Empieza aquí tu búsqueda laboral
+                                <Sparkles className="text-cyan-600" size={24} />
+                                Construir tu CV con IA
                             </a>
 
                             {/* Secondary: Talkme */}
