@@ -99,16 +99,16 @@ const LandingPage = () => {
                         {/* 4 PILLARS GRID */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto text-left">
 
-                            {/* 1. Job Search */}
-                            <a href="https://www.puentesglobales.com" target="_blank" rel="noopener noreferrer" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-cyan-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                            {/* 1. Build CV with AI */}
+                            <a href="https://ats-career-client.vercel.app/#/login" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-cyan-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Search size={100} className="text-cyan-500" />
+                                    <Sparkles size={100} className="text-cyan-500" />
                                 </div>
                                 <div className="w-14 h-14 bg-cyan-600/20 rounded-xl flex items-center justify-center mb-4">
-                                    <Search className="text-cyan-400 w-7 h-7" />
+                                    <Sparkles className="text-cyan-400 w-7 h-7" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Búsqueda Laboral</h3>
-                                <p className="text-slate-400">Accede a ofertas exclusivas en Europa validadas por expertos.</p>
+                                <h3 className="text-2xl font-bold text-white mb-2">Construcción de CV con IA</h3>
+                                <p className="text-slate-400">Crea un CV de alto impacto optimizado para sistemas ATS en minutos.</p>
                             </a>
 
                             {/* 2. ATS Scanner */}
