@@ -77,7 +77,7 @@ const LandingPage = () => {
                         <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
                             {/* Primary: Build CV with AI */}
                             <a
-                                href="https://ats-career-client.vercel.app/#/login"
+                                href="https://ats-career-client.vercel.app/#/cv-wizard"
                                 className="px-8 py-4 bg-white text-slate-900 rounded-full font-extrabold text-lg hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center gap-2 transform hover:-translate-y-1"
                             >
                                 <Sparkles className="text-cyan-600" size={24} />
@@ -100,7 +100,7 @@ const LandingPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto text-left">
 
                             {/* 1. Build CV with AI */}
-                            <a href="https://ats-career-client.vercel.app/#/login" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-cyan-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
+                            <a href="https://ats-career-client.vercel.app/#/cv-wizard" className="group p-8 bg-slate-900/80 border border-slate-800 rounded-3xl hover:border-cyan-500/50 transition-all cursor-pointer hover:shadow-2xl hover:bg-slate-900 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <Sparkles size={100} className="text-cyan-500" />
                                 </div>
