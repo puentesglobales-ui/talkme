@@ -593,6 +593,49 @@ app.post('/api/interview/chat', async (req, res) => {
   }
 });
 
+const psychometricService = require('./services/psychometricService');
+
+app.post('/api/psychometric/submit', async (req, res) => {
+  const { answers, userData } = req.body;
+  // userData: { cvText, jobDescription, role, market } or similar
+
+  if (!answers || !userData || !userData.cvText || !userData.jobDescription) {
+    return res.status(400).json({ error: 'Missing answers or user data (CV/Job)' });
+  }
+
+  try {
+    // 1. Calculate Core Scores
+    const dass21 = psychometricService.calculateDASS21(answers);
+    const flow = psychometricService.calculateFlow(answers);
+    const big5 = psychometricService.calculateBig5(answers);
+
+    const scores = { dass: dass21, flow: flow, big5: big5 };
+
+    // 2. Generate AI Report
+    const aiReport = await psychometricService.generateReport(
+      userData.cvText,
+      userData.jobDescription,
+      scores
+    );
+
+    // 3. Save to DB (Optional / Async)
+    if (userData.userId && supabaseAdmin) {
+      // ... (Insert into psychometric_evaluations logic) ...
+      // Simplified for MVP speed: Just return JSON first
+    }
+
+    res.json({
+      success: true,
+      scores: scores,
+      ai_report: aiReport
+    });
+
+  } catch (error) {
+    console.error('Psychometric Submit Error:', error);
+    res.status(500).json({ error: 'Processing failed', details: error.message });
+  }
+});
+
 app.post('/api/interview/speak', upload.single('audio'), async (req, res) => {
   const audioFile = req.file;
   const { cvText, jobDescription, messages } = req.body;
