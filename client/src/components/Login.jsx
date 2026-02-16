@@ -248,17 +248,6 @@ export default function Login() {
                     </button>
                 </form>
 
-                <div className="mt-8 text-center text-sm text-slate-500">
-                    <button
-                        onClick={() => {
-                            localStorage.setItem('demo_mode', 'true');
-                            window.location.reload();
-                        }}
-                        className="text-xs font-bold text-slate-600 hover:text-slate-400 mb-4 block w-full"
-                    >
-                        Acceso de Invitado (Solo Demo)
-                    </button>
-                </div>
             </motion.div>
         </div>
     );
